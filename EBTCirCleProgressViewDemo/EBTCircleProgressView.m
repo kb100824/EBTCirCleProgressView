@@ -5,8 +5,10 @@
 //  Created by ebaotong on 15/7/2.
 //  Copyright (c) 2015年 com.csst. All rights reserved.
 //
-
+#define kGrayFontColor  [UIColor colorWithRed:0.096 green:0.034 blue:0.100 alpha:0.100]
+#define kRedLightFontColor  [UIColor colorWithRed:0.725 green:0.000 blue:0.000 alpha:1.000]
 #import "EBTCircleProgressView.h"
+
 @interface EBTCircleProgressView ()
 {
     CAShapeLayer *layerBottom;//底部形状的图层
