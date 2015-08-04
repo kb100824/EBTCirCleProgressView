@@ -5,10 +5,8 @@
 //  Created by ebaotong on 15/7/2.
 //  Copyright (c) 2015年 com.csst. All rights reserved.
 //
-#define kGrayFontColor  [UIColor colorWithRed:0.096 green:0.034 blue:0.100 alpha:0.100]
-#define kRedLightFontColor  [UIColor colorWithRed:0.725 green:0.000 blue:0.000 alpha:1.000]
-#import "EBTCircleProgressView.h"
 
+#import "EBTCircleProgressView.h"
 @interface EBTCircleProgressView ()
 {
     CAShapeLayer *layerBottom;//底部形状的图层
@@ -16,7 +14,7 @@
     UIBezierPath *pathBottom;//底部布赛尔曲线
     UIBezierPath *pathTop;//顶部布赛尔曲线
     CATextLayer *layerText; //显示进度值
-
+    CGFloat margin;
 }
 @end
 @implementation EBTCircleProgressView
@@ -48,16 +46,26 @@
     layerTop.fillColor = nil;
     layerTop.frame = self.bounds;
     
-    layerText = [CATextLayer layer];
+   /* layerText = [CATextLayer layer];
     layerText.fontSize = 10.f;
     layerText.contentsScale = [UIScreen mainScreen].scale;
     layerText.foregroundColor = kGrayFontColor.CGColor;
     layerText.alignmentMode = kCAAlignmentCenter;
     layerText.frame = CGRectMake((self.bounds.size.width -CGRectGetWidth(self.bounds)/4.f)/2.f,(self.bounds.size.height -CGRectGetHeight(self.bounds)/6.f)/2.f, CGRectGetWidth(self.bounds)/4.f+10.f, CGRectGetHeight(self.bounds)/6.f);
-
+   [self.layer addSublayer:layerText];
+    */
     [self.layer addSublayer:layerBottom];
     [self.layer addSublayer:layerTop];
-    [self.layer addSublayer:layerText];
+    margin = 0.f;
+    if (iPhone6)
+    {
+        margin = 5.f;
+    }
+    else if (iPhone6Plus)
+    {
+        margin = 5.f;
+    }
+    
 
 }
 
@@ -65,14 +73,14 @@
 {
     _progressTrackStokeColor = progressTrackStokeColor;
     layerBottom.strokeColor = progressTrackStokeColor.CGColor;
-    pathBottom = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetWidth(self.bounds)/2.f, CGRectGetHeight(self.bounds)/2.f) radius:(CGRectGetWidth(self.bounds)-self.progressStorkeWidth)/4.f startAngle:0 endAngle:M_PI*2 clockwise:YES];
+    pathBottom = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetWidth(self.frame)/2.f+margin, CGRectGetHeight(self.frame)/2.5f+3*margin) radius:(CGRectGetWidth(self.frame)-self.progressStorkeWidth)/4.f startAngle:0 endAngle:M_PI*2 clockwise:YES];
     layerBottom.path = pathBottom.CGPath;
 }
 
 - (void)setProgressStorkeWidth:(CGFloat)progressStorkeWidth
 {
     _progressStorkeWidth = progressStorkeWidth;
-    layerBottom.lineWidth = 1.f;
+    layerBottom.lineWidth = progressStorkeWidth;
     layerTop.lineWidth = progressStorkeWidth;
 }
 - (void)setProgressStokeColor:(UIColor *)progressStokeColor
@@ -95,15 +103,19 @@
     {
         _progress = 1.f;
     }
-    pathTop = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetWidth(self.bounds)/2.f, CGRectGetHeight(self.bounds)/2.f) radius:(CGRectGetWidth(self.bounds)-self.progressStorkeWidth)/4.f startAngle:-M_PI_2 endAngle:(2*M_PI)*_progress-M_PI_2 clockwise:YES];
+      pathTop = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetWidth(self.frame)/2.f+margin, CGRectGetHeight(self.frame)/2.5f+3*margin) radius:(CGRectGetWidth(self.frame)-self.progressStorkeWidth)/4.f startAngle:-M_PI_2 endAngle:(2*M_PI)*_progress-M_PI_2 clockwise:YES];
     layerTop.path = pathTop.CGPath;
     /**富文本*/
     NSString *result = [NSString stringWithFormat:@"%ld%%",(long)(_progress*100)];
     NSMutableAttributedString *attributeStr = [[NSMutableAttributedString alloc]initWithString:result];
-    [attributeStr addAttributes:@{NSForegroundColorAttributeName:kRedLightFontColor,NSFontAttributeName:[UIFont systemFontOfSize:20.f]} range:NSMakeRange(0, result.length-1)];
-    layerText.string = attributeStr;
+    [attributeStr addAttributes:@{
+                                   NSForegroundColorAttributeName:kLabelRedLightFontColor,
+                                   NSFontAttributeName:[UIFont systemFontOfSize:20.f]
+                                   }
+                          range:NSMakeRange(0, result.length-1)];
+   // layerText.string = attributeStr;
     /**加旋转动画*/
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     animation.fromValue = @(-M_PI_2);
     animation.toValue = @((2*M_PI)*_progress-M_PI_2);
     animation.repeatCount = 1;
@@ -123,11 +135,11 @@
         _progress = 1.f;
     }
     [layerTop removeAnimationForKey:@"RotationAnimation"];
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     animation.fromValue = @(-M_PI_2);
     animation.toValue = @((2*M_PI)*_progress-M_PI_2);
     animation.repeatCount = 1;
     animation.duration = 0.5f;
-     [layerTop addAnimation:animation forKey:@"RotationAnimation"];
+   [layerTop addAnimation:animation forKey:@"RotationAnimation"];
 }
 @end
